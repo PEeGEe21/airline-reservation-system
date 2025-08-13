@@ -17,7 +17,6 @@ struct Passenger *next; // Pointer to next passenger in the linked list
 // Head of the linked list (starts empty)
 Passenger *head = NULL;
 
-
 // FUNCTION: Add Passenger
 
 void addPassenger(char name[], char id[], char contact[], int seatNumber) {
@@ -98,7 +97,6 @@ int deletePassenger(int seatNumber) {
     return 0; // Passenger not found
 }
 
-
 // FUNCTION: Display All Passengers
 
 void displayAllPassengers() {
@@ -117,7 +115,6 @@ void displayAllPassengers() {
     }
     printf("----------------------\n");
 }
-
 
 // DEMO MAIN (for testing Part 2 only)
 
