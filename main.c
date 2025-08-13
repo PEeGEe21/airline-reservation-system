@@ -38,6 +38,6 @@ typedef struct Passenger {
 
 // main function
 int main(void) {
-    print("Welcome to the Airline Reservation System!\n");
+    print("Welcome to the Airline Reservation System by chidi!\n");
     return 0;
 }
