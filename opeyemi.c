@@ -60,7 +60,6 @@ Passenger* searchPassengerByName(char name[]) {
     return NULL; // Not found
 }
 
-
 // FUNCTION: Search Passenger by Seat Number
 
 Passenger* searchPassengerBySeat(int seatNumber) {
@@ -74,7 +73,6 @@ Passenger* searchPassengerBySeat(int seatNumber) {
     }
     return NULL; // Not found
 }
-
 
 // FUNCTION: Delete Passenger
 
@@ -125,8 +123,8 @@ void displayAllPassengers() {
 
 int main() {
     // Adding passengers
-    addPassenger("John Doe", "P001", "1234567890", 5);
-    addPassenger("Jane Smith", "P002", "0987654321", 8);
+    addPassenger("Opeyemi John", "P001", "1234567890", 5);
+    addPassenger("Jethro Opeyemi", "P002", "0987654321", 8);
 
     // Display all passengers
     displayAllPassengers();
