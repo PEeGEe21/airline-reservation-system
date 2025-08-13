@@ -258,14 +258,24 @@ void bookSeat() {
     displaySeats();
 
     printf("\nEnter row number (1 - %d): ", ROWS);
-    scanf("%d", &row);
-    printf("Enter seat number (1 - %d): ", COLS);
-    scanf("%d", &col);
-
-    if (row < 1 || row > ROWS || col < 1 || col > COLS) {
-        printf("Invalid seat selection.\n");
+    // scanf("%d", &row);
+    if (scanf(" %d", &row) != 1 || row < 1 || row > ROWS) {
+        printf("Invalid row number.\n");
+        while (getchar() != '\n');
         return;
     }
+
+    printf("Enter seat number (1 - %d): ", COLS);
+    if (scanf(" %d", &col) != 1 || col < 1 || col > COLS) {
+        printf("Invalid seat number.\n");
+        while (getchar() != '\n');
+        return;
+    }
+
+    // if (row < 1 || row > ROWS || col < 1 || col > COLS) {
+    //     printf("Invalid seat selection.\n");
+    //     return;
+    // }
 
     row--; col--;
     if (seatMap[row][col] == 1) {
