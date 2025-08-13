@@ -12,7 +12,6 @@
 #define TOTAL_SEATS (ROWS * COLS)
 
 // STRUCT TO STORE PASSENGER DETAILS
-
 typedef struct Passenger {
     char id[MAX_ID];     
     char name[MAX_NAME]; 
@@ -38,6 +37,7 @@ int getSearchChoice();
 void cancelBooking();
 void saveDataToFile();
 void loadDataFromFile();
+void viewAirlineRules(); // NEW FUNCTION
 
 // ===== File Handling =====
 void saveDataToFile() {
@@ -47,7 +47,6 @@ void saveDataToFile() {
         return;
     }
 
-    // Save seat map
     fprintf(fp, "%d %d\n", ROWS, COLS);
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
@@ -56,7 +55,6 @@ void saveDataToFile() {
         fprintf(fp, "\n");
     }
 
-    // Save passengers
     Passenger *temp = head;
     while (temp != NULL) {
         fprintf(fp, "%s,%s,%s,%s,%d\n",
@@ -83,16 +81,14 @@ void loadDataFromFile() {
     int rows, cols;
     fscanf(fp, "%d %d", &rows, &cols);
 
-    // Load seat map
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             fscanf(fp, "%d", &seatMap[i][j]);
         }
     }
 
-    // Load passengers
     char line[200];
-    fgets(line, sizeof(line), fp); // consume newline after seat map
+    fgets(line, sizeof(line), fp);
     while (fgets(line, sizeof(line), fp)) {
         Passenger *newP = (Passenger *)malloc(sizeof(Passenger));
         sscanf(line, "%49[^,],%49[^,],%49[^,],%19[^,],%d",
@@ -109,6 +105,23 @@ void loadDataFromFile() {
     printf("Data loaded successfully!\n");
 }
 
+// ===== NEW FUNCTION =====
+void viewAirlineRules() {
+    FILE *file = fopen("rules.txt", "r");
+    if (!file) {
+        printf("Error: rules.txt not found. Please create the file in the program directory.\n");
+        return;
+    }
+
+    char line[256];
+    printf("\n--- Airline Rules & Regulations ---\n");
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);
+    }
+    printf("-----------------------------------\n");
+    fclose(file);
+}
+
 // ===== Main Menu =====
 int main() {
     int choice;
@@ -122,8 +135,9 @@ int main() {
         printf("3. Display All Passengers\n");
         printf("4. Cancel Booking\n");
         printf("5. Search Passenger\n");
-        printf("6. Exit\n");
-        printf("Enter your choice: ");
+        printf("6. View Airline Rules & Regulations\n"); // NEW MENU OPTION
+        printf("7. Exit\n");
+        printf("Choose an option: ");
         scanf("%d", &choice);
 
         switch (choice) {
@@ -132,14 +146,15 @@ int main() {
             case 3: displayAllPassengers(); break;
             case 4: cancelBooking(); break;
             case 5: searchForPassenger(); break;
-            case 6:
+            case 6: viewAirlineRules(); break; // NEW OPTION
+            case 7:
                 saveDataToFile();
                 printf("Exiting program. Goodbye!\n");
                 break;
             default:
                 printf("Invalid choice! Try again.\n");
         }
-    } while (choice != 6);
+    } while (choice != 7);
 
     return 0;
 }
@@ -259,7 +274,7 @@ void bookSeat() {
     }
 
     seatMap[row][col] = 1;
-    while (getchar() != '\n'); // Clear input buffer
+    while (getchar() != '\n');
     printf("Enter passenger ID: ");
     fgets(id, sizeof(id), stdin); id[strcspn(id, "\n")] = '\0';
     printf("Enter passenger name: ");
