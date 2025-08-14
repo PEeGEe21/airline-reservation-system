@@ -1,0 +1,10 @@
+5 6
+1 0 0 1 0 0 
+0 1 1 0 0 0 
+0 0 0 0 0 0 
+0 0 0 0 0 0 
+0 0 0 0 0 0 
+10,Opeyemi opj,Opeyemi@gmail.com,097648690,1
+11,Praise God ,Praise@gmail.com,080746725,8
+12,James Peter,Peter@yahoo.com,Peter@gmail.com,9
+13,Opeyemi Opj,Opeyemi@gmail.com,009766,4
