@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>   // ⬅️ Add this at the top of your file
+
 
 #define MAX_NAME 50
 #define MAX_PHONE 20
@@ -48,7 +50,7 @@ void saveDataToFile() {
         return;
     }
 
-    // fprintf(fp, "%d %d\n", ROWS, COLS);
+    // Save seat map
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             fprintf(fp, "%d ", seatMap[i][j]);
@@ -56,6 +58,7 @@ void saveDataToFile() {
         fprintf(fp, "\n");
     }
 
+    // Save passengers linked list
     Passenger *temp = head;
     while (temp != NULL) {
         fprintf(fp, "%s,%s,%s,%s,%d\n",
@@ -68,7 +71,15 @@ void saveDataToFile() {
     }
 
     fclose(fp);
-    printf("Data saved successfully!\n");
+
+    // ✅ Add timestamp
+    time_t now;
+    time(&now);
+    struct tm *local = localtime(&now);
+
+    printf("Data saved successfully at %02d:%02d:%02d on %02d/%02d/%d\n",
+           local->tm_hour, local->tm_min, local->tm_sec,
+           local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
 }
 
 void loadDataFromFile() {
@@ -130,32 +141,35 @@ int main() {
     loadDataFromFile();
 
     do {
-        printf("\n===== AIRLINE BOOKING MENU =====\n");
-        printf("1. Display Seat Map:\n");
-        printf("2. Book a Seat:\n");
-        printf("3. Display All Passengers:\n");
-        printf("4. Cancel Booking:\n");
-        printf("5. Search Passenger:\n");
-        printf("6. View Airline Rules & Regulations:\n"); // NEW MENU OPTION
-        printf("7. Exit:\n");
-        printf("Choose an option: ");
-        scanf("%d", &choice);
+    printf("\n===== AIRLINE BOOKING MENU =====\n");
+    printf("1. Display Seat Map:\n");
+    printf("2. Book a Seat:\n");
+    printf("3. Display All Passengers:\n");
+    printf("4. Cancel Booking:\n");
+    printf("5. Search Passenger:\n");
+    printf("6. View Airline Rules & Regulations:\n");
+    printf("7. Save Data Now:\n");   // ✅ New Option
+    printf("8. Exit:\n");           // Exit shifted to 8
+    printf("Choose an option: ");
+    scanf("%d", &choice);
 
-        switch (choice) {
-            case 1: displaySeats(); break;
-            case 2: bookSeat(); break;
-            case 3: displayAllPassengers(); break;
-            case 4: cancelBooking(); break;
-            case 5: searchForPassenger(); break;
-            case 6: viewAirlineRules(); break; // NEW OPTION
-            case 7:
-                saveDataToFile();
-                printf("Exiting program. Goodbye!\n");
-                break;
-            default:
-                printf("Invalid choice! Try again.\n");
-        }
-    } while (choice != 7);
+    switch (choice) {
+        case 1: displaySeats(); break;
+        case 2: bookSeat(); break;
+        case 3: displayAllPassengers(); break;
+        case 4: cancelBooking(); break;
+        case 5: searchForPassenger(); break;
+        case 6: viewAirlineRules(); break;
+        case 7: saveDataToFile(); break;   // ✅ Manual save
+        case 8:
+            saveDataToFile();
+            printf("Exiting program. Goodbye!\n");
+            break;
+        default:
+            printf("Invalid choice! Try again.\n");
+    }
+} while (choice != 8);
+
 
     return 0;
 }
