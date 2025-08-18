@@ -32,6 +32,7 @@ void addPassenger(char id[], char name[], char email[], char phone[], char seatN
 Passenger* searchPassengerByName(char name[]);
 Passenger* searchPassengerBySeat(char seatNumber[]);
 int deletePassenger(char seatNumber[]);
+char confirmDeletion();
 void displayAllPassengers();
 void searchForPassenger();
 int getSearchChoice();
@@ -48,7 +49,7 @@ void saveDataToFile() {
         return;
     }
 
-    fprintf(fp, "%d %d\n", ROWS, COLS);
+    // fprintf(fp, "%d %d\n", ROWS, COLS);
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             fprintf(fp, "%d ", seatMap[i][j]);
@@ -92,7 +93,7 @@ void loadDataFromFile() {
     fgets(line, sizeof(line), fp);
     while (fgets(line, sizeof(line), fp)) {
         Passenger *newP = (Passenger *)malloc(sizeof(Passenger));
-        sscanf(line, "%49[^,],%49[^,],%49[^,],%19[^,],%9s",
+        sscanf(line, "%49[^,],%49[^,],%49[^,],%19[^,],%s",
                newP->id,
                newP->name,
                newP->email,
@@ -131,13 +132,13 @@ int main() {
 
     do {
         printf("\n===== AIRLINE BOOKING MENU =====\n");
-        printf("1. Display Seat Map\n");
-        printf("2. Book a Seat\n");
-        printf("3. Display All Passengers\n");
-        printf("4. Cancel Booking\n");
-        printf("5. Search Passenger\n");
-        printf("6. View Airline Rules & Regulations\n");
-        printf("7. Exit\n");
+        printf("1. Display Seat Map:\n");
+        printf("2. Book a Seat:\n");
+        printf("3. Display All Passengers:\n");
+        printf("4. Cancel Booking:\n");
+        printf("5. Search Passenger:\n");
+        printf("6. View Airline Rules & Regulations:\n"); // NEW MENU OPTION
+        printf("7. Exit:\n");
         printf("Choose an option: ");
         scanf("%d", &choice);
 
@@ -147,7 +148,7 @@ int main() {
             case 3: displayAllPassengers(); break;
             case 4: cancelBooking(); break;
             case 5: searchForPassenger(); break;
-            case 6: viewAirlineRules(); break;
+            case 6: viewAirlineRules(); break; // NEW OPTION
             case 7:
                 saveDataToFile();
                 printf("Exiting program. Goodbye!\n");
@@ -178,13 +179,15 @@ void addPassenger(char id[], char name[], char email[], char phone[], char seatN
         temp->next = newPassenger;
     }
     printf("Passenger %s added successfully for seat %s.\n", name, seatNumber);
+
+    saveDataToFile();
+
 }
 
 Passenger* searchPassengerByName(char name[]) {
     Passenger *temp = head;
     while (temp != NULL) {
-        if (strcmp(temp->name, name) == 0) 
-        return temp;
+        if (strcmp(temp->name, name) == 0) return temp;
         temp = temp->next;
     }
     return NULL;
@@ -193,8 +196,7 @@ Passenger* searchPassengerByName(char name[]) {
 Passenger* searchPassengerBySeat(char seatNumber[]) {
     Passenger *temp = head;
     while (temp != NULL) {
-        if (strcmp(temp->seatNumber, seatNumber) == 0) 
-        return temp;
+        if (strcmp(temp->seatNumber, seatNumber) == 0) return temp;
         temp = temp->next;
     }
     return NULL;
@@ -219,6 +221,13 @@ int getSearchChoice() {
     int choice;
     printf("Search by: 1. Name 2. Seat Number: ");
     scanf("%d", &choice);
+    return choice;
+}
+
+char confirmDeletion() {
+    char choice;
+    printf("Are you sure you want to cancel this booking? (y/n): \n" );
+    scanf("%s", &choice);
     return choice;
 }
 
@@ -253,6 +262,18 @@ void searchForPassenger() {
     }
 }
 
+// Function to search passenger by ID
+Passenger* findPassengerById(const char *id) {
+    Passenger *current = head;
+    while (current != NULL) {
+        if (strcmp(current->id, id) == 0) {
+            return current; // Found a passenger with same ID
+        }
+        current = current->next;
+    }
+    return NULL; // Not found
+}
+
 // ===== Booking & Cancellation =====
 void bookSeat() {
     int row, col;
@@ -262,7 +283,10 @@ void bookSeat() {
 
     displaySeats();
 
-    printf("\nEnter seat number (eg. 1a): ");
+   
+
+
+      printf("\nEnter seat number (eg. 1a): ");
     if (scanf("%d%c", &row, &colLetter) != 2) {
         printf("Invalid format. Use something like 1a.\n");
         while (getchar() != '\n'); // clear input buffer
@@ -287,11 +311,30 @@ void bookSeat() {
         return;
     }
 
-    // Book the seat
-    seatMap[row][col] = 1;
-    while (getchar() != '\n');
+
+
+
+    // if (row < 1 || row > ROWS || col < 1 || col > COLS) {
+    //     printf("Invalid seat selection.\n");
+    //     return;
+    // }
+
+    // row--; col--;
+    // if (seatMap[row][col] == 1) {
+    //     printf("Sorry, that seat is already booked.\n");
+    //     return;
+    // }
+
+    while (getchar() != '\n'); // Clear input buffer
     printf("Enter passenger ID: ");
     fgets(id, sizeof(id), stdin); id[strcspn(id, "\n")] = '\0';
+
+    //  Check for duplicate ID before booking
+    if (findPassengerById(id) != NULL) {
+        printf("Error: Passenger with this ID already exists. Cannot book.\n");
+        return;
+    }
+
     printf("Enter passenger name: ");
     fgets(name, sizeof(name), stdin); name[strcspn(name, "\n")] = '\0';
     printf("Enter passenger phone number: ");
@@ -299,10 +342,15 @@ void bookSeat() {
     printf("Enter passenger email: ");
     fgets(email, sizeof(email), stdin); email[strcspn(email, "\n")] = '\0';
 
-    // Build seat number as "RowLetter" format
+    seatMap[row][col] = 1; // Mark seat as booked
+    // int seatNumber = row * COLS + col + 1;
+    // addPassenger(id, name, email, phone, seatNumber);
+
     sprintf(seatNumber, "%d%c", row + 1, col + 'A');
 
     addPassenger(id, name, email, phone, seatNumber);
+
+    printf("Seat booked successfully!\n");
 }
 
 void cancelBooking() {
@@ -310,6 +358,24 @@ void cancelBooking() {
         printf("No passengers booked yet.\n");
         return;
     }
+    // char seatNumber[10];
+    // printf("Enter seat number to cancel booking: ");
+    // scanf("%s", seatNumber);
+
+    
+
+    // if (seatNumber < 1 || seatNumber > TOTAL_SEATS) {
+    //     printf("Invalid seat number.\n");
+    //     return;
+    // }
+
+    // int row = (seatNumber - 1) / COLS;
+    // int col = (seatNumber - 1) % COLS;
+
+    // if (seatMap[row][col] == 0) {
+    //     printf("Seat %d is not booked.\n", seatNumber);
+    //     return;
+    // }
 
     char seatNumber[10];
     printf("Enter seat number to cancel booking (e.g., 2B): ");
@@ -329,11 +395,19 @@ void cancelBooking() {
         return;
     }
 
-    seatMap[row][col] = 0;
-    if (deletePassenger(seatNumber))
-        printf("Booking for seat %s cancelled successfully.\n", seatNumber);
-    else
-        printf("Passenger not found for seat %s.\n", seatNumber);
+
+    char confirmDelete = confirmDeletion();
+
+    if(confirmDelete == 'y' || confirmDelete == 'Y' ){
+        seatMap[row][col] = 0;
+        if (deletePassenger(seatNumber)){
+            saveDataToFile();
+            printf("Booking for seat %s cancelled successfully.\n", seatNumber);
+        }
+        else
+            printf("Passenger not found for seat %s.\n", seatNumber);
+    }
+    return;
 }
 
 int deletePassenger(char seatNumber[]) {
