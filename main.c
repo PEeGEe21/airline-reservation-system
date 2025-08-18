@@ -130,13 +130,13 @@ int main() {
 
     do {
         printf("\n===== AIRLINE BOOKING MENU =====\n");
-        printf("1. Display Seat Map\n");
-        printf("2. Book a Seat\n");
-        printf("3. Display All Passengers\n");
-        printf("4. Cancel Booking\n");
-        printf("5. Search Passenger\n");
-        printf("6. View Airline Rules & Regulations\n"); // NEW MENU OPTION
-        printf("7. Exit\n");
+        printf("1. Display Seat Map:\n");
+        printf("2. Book a Seat:\n");
+        printf("3. Display All Passengers:\n");
+        printf("4. Cancel Booking:\n");
+        printf("5. Search Passenger:\n");
+        printf("6. View Airline Rules & Regulations:\n"); // NEW MENU OPTION
+        printf("7. Exit:\n");
         printf("Choose an option: ");
         scanf("%d", &choice);
 
@@ -250,6 +250,18 @@ void searchForPassenger() {
     }
 }
 
+// Function to search passenger by ID
+Passenger* findPassengerById(const char *id) {
+    Passenger *current = head;
+    while (current != NULL) {
+        if (strcmp(current->id, id) == 0) {
+            return current; // Found a passenger with same ID
+        }
+        current = current->next;
+    }
+    return NULL; // Not found
+}
+
 // ===== Booking & Cancellation =====
 void bookSeat() {
     int row, col;
@@ -283,10 +295,16 @@ void bookSeat() {
         return;
     }
 
-    seatMap[row][col] = 1;
-    while (getchar() != '\n');
+    while (getchar() != '\n'); // Clear input buffer
     printf("Enter passenger ID: ");
     fgets(id, sizeof(id), stdin); id[strcspn(id, "\n")] = '\0';
+
+    //  Check for duplicate ID before booking
+    if (findPassengerById(id) != NULL) {
+        printf("Error: Passenger with this ID already exists. Cannot book.\n");
+        return;
+    }
+
     printf("Enter passenger name: ");
     fgets(name, sizeof(name), stdin); name[strcspn(name, "\n")] = '\0';
     printf("Enter passenger phone number: ");
@@ -294,8 +312,11 @@ void bookSeat() {
     printf("Enter passenger email: ");
     fgets(email, sizeof(email), stdin); email[strcspn(email, "\n")] = '\0';
 
+    seatMap[row][col] = 1; // Mark seat as booked
     int seatNumber = row * COLS + col + 1;
     addPassenger(id, name, email, phone, seatNumber);
+
+    printf("Seat booked successfully!\n");
 }
 
 void cancelBooking() {
