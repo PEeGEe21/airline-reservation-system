@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>   // ⬅️ Add this at the top of your file
+#include <time.h>
 
 
 #define MAX_NAME 50
@@ -40,7 +40,7 @@ int getSearchChoice();
 void cancelBooking();
 void saveDataToFile();
 void loadDataFromFile();
-void viewAirlineRules(); // NEW FUNCTION
+void viewAirlineRules();
 
 // ===== File Handling =====
 void saveDataToFile() {
@@ -72,7 +72,6 @@ void saveDataToFile() {
 
     fclose(fp);
 
-    // ✅ Add timestamp
     time_t now;
     time(&now);
     struct tm *local = localtime(&now);
@@ -82,6 +81,7 @@ void saveDataToFile() {
            local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
 }
 
+// load data from file
 void loadDataFromFile() {
     FILE *fp = fopen("booking_data.txt", "r");
     if (!fp) {
@@ -117,7 +117,7 @@ void loadDataFromFile() {
     printf("Data loaded successfully!\n");
 }
 
-// ===== NEW FUNCTION =====
+// ===== GET AIRLINE RULES =====
 void viewAirlineRules() {
     FILE *file = fopen("rules.txt", "r");
     if (!file) {
@@ -148,8 +148,8 @@ int main() {
     printf("4. Cancel Booking:\n");
     printf("5. Search Passenger:\n");
     printf("6. View Airline Rules & Regulations:\n");
-    printf("7. Save Data Now:\n");   // ✅ New Option
-    printf("8. Exit:\n");           // Exit shifted to 8
+    printf("7. Save Data Now:\n");
+    printf("8. Exit:\n");          
     printf("Choose an option: ");
     scanf("%d", &choice);
 
@@ -160,7 +160,7 @@ int main() {
         case 4: cancelBooking(); break;
         case 5: searchForPassenger(); break;
         case 6: viewAirlineRules(); break;
-        case 7: saveDataToFile(); break;   // ✅ Manual save
+        case 7: saveDataToFile(); break;
         case 8:
             saveDataToFile();
             printf("Exiting program. Goodbye!\n");
@@ -197,7 +197,9 @@ void addPassenger(char id[], char name[], char email[], char phone[], int seatNu
 
 }
 
+// search all passengers by name
 Passenger* searchPassengerByName(char name[]) {
+    // use linear search to search for passenger by name
     Passenger *temp = head;
     while (temp != NULL) {
         if (strcmp(temp->name, name) == 0) return temp;
@@ -206,8 +208,10 @@ Passenger* searchPassengerByName(char name[]) {
     return NULL;
 }
 
+// search all passengers by seat
 Passenger* searchPassengerBySeat(int seatNumber) {
     Passenger *temp = head;
+    // use linear search to search for passenger by seatNumber
     while (temp != NULL) {
         if (temp->seatNumber == seatNumber) return temp;
         temp = temp->next;
@@ -215,6 +219,7 @@ Passenger* searchPassengerBySeat(int seatNumber) {
     return NULL;
 }
 
+// display all passengers
 void displayAllPassengers() {
     Passenger *temp = head;
     if (!temp) {
@@ -230,6 +235,7 @@ void displayAllPassengers() {
     printf("----------------------\n");
 }
 
+// search choice
 int getSearchChoice() {
     int choice;
     printf("Search by: 1. Name 2. Seat Number: ");
@@ -237,6 +243,7 @@ int getSearchChoice() {
     return choice;
 }
 
+// confirm delete
 char confirmDeletion() {
     char choice;
     printf("Are you sure you want to cancel this booking? (y/n): \n" );
@@ -244,11 +251,14 @@ char confirmDeletion() {
     return choice;
 }
 
+// search passenger
 void searchForPassenger() {
     if (!head) {
         printf("No passengers booked yet.\n");
         return;
     }
+
+    // get search choice
     int choice = getSearchChoice();
     if (choice == 1) {
         char name[MAX_NAME];
@@ -280,7 +290,7 @@ Passenger* findPassengerById(const char *id) {
     Passenger *current = head;
     while (current != NULL) {
         if (strcmp(current->id, id) == 0) {
-            return current; // Found a passenger with same ID
+            return current;
         }
         current = current->next;
     }
@@ -344,6 +354,7 @@ void bookSeat() {
     printf("Seat booked successfully!\n");
 }
 
+// cancel booking
 void cancelBooking() {
     if (!head) {
         printf("No passengers booked yet.\n");
@@ -368,6 +379,7 @@ void cancelBooking() {
 
     char confirmDelete = confirmDeletion();
 
+    // confirm delete
     if(confirmDelete == 'y' || confirmDelete == 'Y' ){
         seatMap[row][col] = 0;
         if (deletePassenger(seatNumber))
@@ -378,8 +390,10 @@ void cancelBooking() {
     return;
 }
 
+// delete passenger
 int deletePassenger(int seatNumber) {
     Passenger *temp = head, *prev = NULL;
+    // use linear search to search passenger
     while (temp) {
         if (temp->seatNumber == seatNumber) {
             if (prev) prev->next = temp->next;
