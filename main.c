@@ -311,20 +311,6 @@ void bookSeat() {
         return;
     }
 
-
-
-
-    // if (row < 1 || row > ROWS || col < 1 || col > COLS) {
-    //     printf("Invalid seat selection.\n");
-    //     return;
-    // }
-
-    // row--; col--;
-    // if (seatMap[row][col] == 1) {
-    //     printf("Sorry, that seat is already booked.\n");
-    //     return;
-    // }
-
     while (getchar() != '\n'); // Clear input buffer
     printf("Enter passenger ID: ");
     fgets(id, sizeof(id), stdin); id[strcspn(id, "\n")] = '\0';
@@ -343,8 +329,6 @@ void bookSeat() {
     fgets(email, sizeof(email), stdin); email[strcspn(email, "\n")] = '\0';
 
     seatMap[row][col] = 1; // Mark seat as booked
-    // int seatNumber = row * COLS + col + 1;
-    // addPassenger(id, name, email, phone, seatNumber);
 
     sprintf(seatNumber, "%d%c", row + 1, col + 'A');
 
@@ -358,24 +342,6 @@ void cancelBooking() {
         printf("No passengers booked yet.\n");
         return;
     }
-    // char seatNumber[10];
-    // printf("Enter seat number to cancel booking: ");
-    // scanf("%s", seatNumber);
-
-    
-
-    // if (seatNumber < 1 || seatNumber > TOTAL_SEATS) {
-    //     printf("Invalid seat number.\n");
-    //     return;
-    // }
-
-    // int row = (seatNumber - 1) / COLS;
-    // int col = (seatNumber - 1) % COLS;
-
-    // if (seatMap[row][col] == 0) {
-    //     printf("Seat %d is not booked.\n", seatNumber);
-    //     return;
-    // }
 
     char seatNumber[10];
     printf("Enter seat number to cancel booking (e.g., 2B): ");
