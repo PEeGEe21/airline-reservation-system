@@ -1,7 +1,0 @@
-0 1 0 0 0 0 
-0 0 0 1 0 0 
-0 0 0 0 0 0 
-0 0 0 0 0 0 
-0 0 0 0 0 0 
-12,sarah,sarahnnanyelugo@gmail.com,08160480691,2
-24,sarah,sarah@gmail.com,0828e848848833,10

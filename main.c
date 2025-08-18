@@ -193,7 +193,7 @@ void addPassenger(char id[], char name[], char email[], char phone[], int seatNu
     }
     printf("Passenger %s added successfully for seat %d.\n", name, seatNumber);
 
-    saveDataToFile();
+    // saveDataToFile();
 
 }
 
