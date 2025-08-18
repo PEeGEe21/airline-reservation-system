@@ -136,7 +136,7 @@ int main() {
         printf("3. Display All Passengers\n");
         printf("4. Cancel Booking\n");
         printf("5. Search Passenger\n");
-        printf("6. View Airline Rules & Regulations\n"); // NEW MENU OPTION
+        printf("6. View Airline Rules & Regulations\n");
         printf("7. Exit\n");
         printf("Choose an option: ");
         scanf("%d", &choice);
@@ -147,7 +147,7 @@ int main() {
             case 3: displayAllPassengers(); break;
             case 4: cancelBooking(); break;
             case 5: searchForPassenger(); break;
-            case 6: viewAirlineRules(); break; // NEW OPTION
+            case 6: viewAirlineRules(); break;
             case 7:
                 saveDataToFile();
                 printf("Exiting program. Goodbye!\n");
@@ -183,7 +183,8 @@ void addPassenger(char id[], char name[], char email[], char phone[], char seatN
 Passenger* searchPassengerByName(char name[]) {
     Passenger *temp = head;
     while (temp != NULL) {
-        if (strcmp(temp->name, name) == 0) return temp;
+        if (strcmp(temp->name, name) == 0) 
+        return temp;
         temp = temp->next;
     }
     return NULL;
@@ -192,7 +193,7 @@ Passenger* searchPassengerByName(char name[]) {
 Passenger* searchPassengerBySeat(char seatNumber[]) {
     Passenger *temp = head;
     while (temp != NULL) {
-        if (strcpy(temp->seatNumber, seatNumber) == 0) 
+        if (strcmp(temp->seatNumber, seatNumber) == 0) 
         return temp;
         temp = temp->next;
     }
@@ -338,7 +339,7 @@ void cancelBooking() {
 int deletePassenger(char seatNumber[]) {
     Passenger *temp = head, *prev = NULL;
     while (temp) {
-        if (strcpy( temp->seatNumber, seatNumber) == 0) {
+        if (strcmp( temp->seatNumber, seatNumber) == 0) {
             if (prev) prev->next = temp->next;
             else head = temp->next;
             free(temp);
