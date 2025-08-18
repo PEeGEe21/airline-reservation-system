@@ -31,6 +31,7 @@ void addPassenger(char id[], char name[], char email[], char phone[], int seatNu
 Passenger* searchPassengerByName(char name[]);
 Passenger* searchPassengerBySeat(int seatNumber);
 int deletePassenger(int seatNumber);
+char confirmDeletion();
 void displayAllPassengers();
 void searchForPassenger();
 int getSearchChoice();
@@ -47,7 +48,7 @@ void saveDataToFile() {
         return;
     }
 
-    fprintf(fp, "%d %d\n", ROWS, COLS);
+    // fprintf(fp, "%d %d\n", ROWS, COLS);
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             fprintf(fp, "%d ", seatMap[i][j]);
@@ -177,6 +178,9 @@ void addPassenger(char id[], char name[], char email[], char phone[], int seatNu
         temp->next = newPassenger;
     }
     printf("Passenger %s added successfully for seat %d.\n", name, seatNumber);
+
+    saveDataToFile();
+
 }
 
 Passenger* searchPassengerByName(char name[]) {
@@ -216,6 +220,13 @@ int getSearchChoice() {
     int choice;
     printf("Search by: 1. Name 2. Seat Number: ");
     scanf("%d", &choice);
+    return choice;
+}
+
+char confirmDeletion() {
+    char choice;
+    printf("Are you sure you want to cancel this booking? (y/n): \n" );
+    scanf("%s", &choice);
     return choice;
 }
 
@@ -341,11 +352,16 @@ void cancelBooking() {
         return;
     }
 
-    seatMap[row][col] = 0;
-    if (deletePassenger(seatNumber))
-        printf("Booking for seat %d cancelled successfully.\n", seatNumber);
-    else
-        printf("Passenger not found for seat %d.\n", seatNumber);
+    char confirmDelete = confirmDeletion();
+
+    if(confirmDelete == 'y' || confirmDelete == 'Y' ){
+        seatMap[row][col] = 0;
+        if (deletePassenger(seatNumber))
+            printf("Booking for seat %d cancelled successfully.\n", seatNumber);
+        else
+            printf("Passenger not found for seat %d.\n", seatNumber);
+    }
+    return;
 }
 
 int deletePassenger(int seatNumber) {
