@@ -345,47 +345,6 @@ int main() {
     return 0;
 }
 
-
-// ===== Main Menu =====
-// int main() {
-//     int choice;
-
-//     loadDataFromFile();
-
-//     do {
-//     printf("\n===== AIRLINE BOOKING MENU =====\n");
-//     printf("1. Display Seat Map:\n");
-//     printf("2. Book a Seat:\n");
-//     printf("3. Display All Passengers:\n");
-//     printf("4. Cancel Booking:\n");
-//     printf("5. Search Passenger:\n");
-//     printf("6. View Airline Rules & Regulations:\n");
-//     printf("7. Save Data Now:\n");
-//     printf("8. Exit:\n");          
-//     printf("Choose an option: ");
-//     scanf("%d", &choice);
-
-//     switch (choice) {
-//         case 1: displaySeats(); break;
-//         case 2: bookSeat(); break;
-//         case 3: displayAllPassengers(); break;
-//         case 4: cancelBooking(); break;
-//         case 5: searchForPassenger(); break;
-//         case 6: viewAirlineRules(); break;
-//         case 7: saveDataToFile(); break;
-//         case 8:
-//             saveDataToFile();
-//             printf("Exiting program. Goodbye!\n");
-//             break;
-//         default:
-//             printf("Invalid choice! Try again.\n");
-//     }
-// } while (choice != 8);
-
-
-//     return 0;
-// }
-
 // ===== Passenger Functions =====
 void addPassenger(char id[], char name[], char email[], char phone[], int seatNumber) {
     Passenger *newPassenger = (Passenger *)malloc(sizeof(Passenger));
@@ -569,11 +528,6 @@ void bookSeat() {
         while (getchar() != '\n');
         return;
     }
-
-    // if (row < 1 || row > ROWS || col < 1 || col > COLS) {
-    //     printf("Invalid seat selection.\n");
-    //     return;
-    // }
 
     row--; col--;
     if (seatMap[row][col] == 1) {
