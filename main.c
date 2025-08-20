@@ -12,6 +12,9 @@
 #define ROWS 5
 #define COLS 6
 #define TOTAL_SEATS (ROWS * COLS)
+#define MAX_ADMINS 10
+#define MAX_USERNAME 30
+#define MAX_PASSWORD 30
 
 // STRUCT TO STORE PASSENGER DETAILS
 typedef struct Passenger {
@@ -23,8 +26,16 @@ typedef struct Passenger {
     struct Passenger *next;
 } Passenger;
 
+// ===== Admin Struct =====
+typedef struct Admin {
+    char username[MAX_USERNAME];
+    char password[MAX_PASSWORD];
+} Admin;
+
 Passenger *head = NULL;
 int seatMap[ROWS][COLS]; // 0 = available, 1 = booked
+Admin admins[MAX_ADMINS];
+int adminCount = 0;
 
 // ===== Function Prototypes =====
 void displaySeats();
@@ -42,6 +53,12 @@ void saveDataToFile();
 void loadDataFromFile();
 void viewAirlineRules();
 
+// ===== Admin Functions =====
+int loginAdmin();
+void createNewAdmin();
+void adminMenu();
+void userMenu();
+
 // ===== File Handling =====
 void saveDataToFile() {
     FILE *fp = fopen("booking_data.txt", "w");
@@ -50,7 +67,7 @@ void saveDataToFile() {
         return;
     }
 
-    // Save seat map
+    fprintf(fp, "%d %d\n", ROWS, COLS);
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             fprintf(fp, "%d ", seatMap[i][j]);
@@ -134,45 +151,176 @@ void viewAirlineRules() {
     fclose(file);
 }
 
-// ===== Main Menu =====
-int main() {
+
+// ===== Admin System =====
+int loginAdmin() {
+    char username[MAX_USERNAME], password[MAX_PASSWORD];
+
+    printf("Enter admin username: ");
+    scanf("%s", username);
+    printf("Enter admin password: ");
+    scanf("%s", password);
+
+    for (int i = 0; i < adminCount; i++) {
+        if (strcmp(admins[i].username, username) == 0 &&
+            strcmp(admins[i].password, password) == 0) {
+            printf("Login successful!\n");
+            return 1; 
+        }
+    }
+    printf("Invalid admin credentials.\n");
+    return 0; 
+}
+
+
+void createNewAdmin() {
+    if (adminCount >= MAX_ADMINS) {
+        printf("Max admin limit reached!\n");
+        return;
+    }
+    printf("Enter new admin username: ");
+    scanf("%s", admins[adminCount].username);
+    printf("Enter new admin password: ");
+    scanf("%s", admins[adminCount].password);
+    adminCount++;
+    printf("New admin created successfully!\n");
+}
+
+// ===== Admin Menu =====
+void adminMenu() {
     int choice;
+    do {
+        printf("\n===== ADMIN MENU =====\n");
+        printf("1. Display Seat Map\n");
+        printf("2. Book a Seat\n");
+        printf("3. Display All Passengers\n");
+        printf("4. Cancel Booking\n");
+        printf("5. Search Passenger\n");
+        printf("6. View Airline Rules & Regulations\n");
+        printf("7. Save Data Now\n");
+        printf("8. Create a New Admin\n");
+        printf("9. Exit Admin Menu\n");
+        printf("Choose an option: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1: displaySeats(); break;
+            case 2: bookSeat(); break;
+            case 3: displayAllPassengers(); break;
+            case 4: cancelBooking(); break;
+            case 5: searchForPassenger(); break;
+            case 6: viewAirlineRules(); break;
+            case 7: saveDataToFile(); break;
+            case 8: createNewAdmin(); break;
+            case 9: printf("Exiting Admin Menu...\n"); break;
+            default: printf("Invalid choice!\n");
+        }
+    } while (choice != 9);
+}
+
+// ===== User Menu =====
+void userMenu() {
+    int choice;
+    do {
+        printf("\n===== USER MENU =====\n");
+        printf("1. Display Seat Map\n");
+        printf("2. Book a Seat\n");
+        printf("3. Cancel Booking\n");
+        printf("4. Search Your Booking Detail\n");
+        printf("5. View Airline Rules & Regulations\n");
+        printf("6. Save Data Now\n");
+        printf("7. Exit User Menu\n");
+        printf("Choose an option: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1: displaySeats(); break;
+            case 2: bookSeat(); break;
+            case 3: cancelBooking(); break;
+            case 4: searchForPassenger(); break;
+            case 5: viewAirlineRules(); break;
+            case 6: saveDataToFile(); break;
+            case 7: printf("Exiting User Menu...\n"); break;
+            default: printf("Invalid choice!\n");
+        }
+    } while (choice != 7);
+}
+
+// ===== Main Menu=====
+int main() {
+    strcpy(admins[0].username, "admin");
+    strcpy(admins[0].password, "password");
+    adminCount = 1;
 
     loadDataFromFile();
 
-    do {
-    printf("\n===== AIRLINE BOOKING MENU =====\n");
-    printf("1. Display Seat Map:\n");
-    printf("2. Book a Seat:\n");
-    printf("3. Display All Passengers:\n");
-    printf("4. Cancel Booking:\n");
-    printf("5. Search Passenger:\n");
-    printf("6. View Airline Rules & Regulations:\n");
-    printf("7. Save Data Now:\n");
-    printf("8. Exit:\n");          
-    printf("Choose an option: ");
-    scanf("%d", &choice);
+    int roleChoice;
+    while (1) {  
+        printf("\n===== AIRLINE RESERVATION SYSTEM =====\n");
+        printf("1. Admin Login\n");
+        printf("2. User Access\n");
+        printf("3. Exit\n");
+        printf("Choose role: ");
+        scanf("%d", &roleChoice);
 
-    switch (choice) {
-        case 1: displaySeats(); break;
-        case 2: bookSeat(); break;
-        case 3: displayAllPassengers(); break;
-        case 4: cancelBooking(); break;
-        case 5: searchForPassenger(); break;
-        case 6: viewAirlineRules(); break;
-        case 7: saveDataToFile(); break;
-        case 8:
-            saveDataToFile();
-            printf("Exiting program. Goodbye!\n");
+        if (roleChoice == 1) {
+            if (loginAdmin()) {
+                adminMenu();
+            } else {
+                continue;
+            }
+        } else if (roleChoice == 2) {
+            userMenu();
+        } else if (roleChoice == 3) {
+            printf("Exiting system...\n");
             break;
-        default:
-            printf("Invalid choice! Try again.\n");
+        } else {
+            printf("Invalid choice. Try again.\n");
+        }
     }
-} while (choice != 8);
 
-
+    // saveDataToFile();
     return 0;
 }
+
+
+// ===== Main Menu =====
+// int main() {
+//     int choice;
+
+//     loadDataFromFile();
+
+//     do {
+//     printf("\n===== AIRLINE BOOKING MENU =====\n");
+//     printf("1. Display Seat Map:\n");
+//     printf("2. Book a Seat:\n");
+//     printf("3. Display All Passengers:\n");
+//     printf("4. Cancel Booking:\n");
+//     printf("5. Search Passenger:\n");
+//     printf("6. View Airline Rules & Regulations:\n");
+//     printf("7. Save Data Now:\n");
+//     printf("8. Exit:\n");          
+//     printf("Choose an option: ");
+//     scanf("%d", &choice);
+
+//     switch (choice) {
+//         case 1: displaySeats(); break;
+//         case 2: bookSeat(); break;
+//         case 3: displayAllPassengers(); break;
+//         case 4: cancelBooking(); break;
+//         case 5: searchForPassenger(); break;
+//         case 6: viewAirlineRules(); break;
+//         case 7: saveDataToFile(); break;
+//         case 8:
+//             saveDataToFile();
+//             printf("Exiting program. Goodbye!\n");
+//             break;
+//         default:
+//             printf("Invalid choice! Try again.\n");
+//     }
+// } while (choice != 8);
+
+
+//     return 0;
+// }
 
 // ===== Passenger Functions =====
 void addPassenger(char id[], char name[], char email[], char phone[], int seatNumber) {
