@@ -43,6 +43,7 @@ void bookSeat();
 void addPassenger(char id[], char name[], char email[], char phone[], int seatNumber);
 Passenger* searchPassengerByName(char name[]);
 Passenger* searchPassengerBySeat(int seatNumber);
+Passenger* findPassengerById(const char *id);
 int deletePassenger(int seatNumber);
 char confirmDeletion();
 void displayAllPassengers();
@@ -52,12 +53,17 @@ void cancelBooking();
 void saveDataToFile();
 void loadDataFromFile();
 void viewAirlineRules();
+void cancelUserBooking();
+void userMenu();
+void searchForMyPassengerDetails();
 
 // ===== Admin Functions =====
 int loginAdmin();
 void createNewAdmin();
 void adminMenu();
-void userMenu();
+void saveAdminData();
+void loadAdminData();
+void displayAdmins();
 
 // ===== File Handling =====
 void saveDataToFile() {
@@ -98,6 +104,21 @@ void saveDataToFile() {
            local->tm_mday, local->tm_mon + 1, local->tm_year + 1900);
 }
 
+void saveAdminData() {
+    FILE *fp = fopen("admin_data.txt", "w");
+    if (!fp) {
+        printf("Error saving admin data!\n");
+        return;
+    }
+    fprintf(fp, "%d\n", adminCount);
+    for (int i = 0; i < adminCount; i++) {
+        fprintf(fp, "%s,%s\n", admins[i].username, admins[i].password);
+    }
+    fclose(fp);
+    printf("Admin data saved successfully!\n");
+}
+
+
 // load data from file
 void loadDataFromFile() {
     FILE *fp = fopen("booking_data.txt", "r");
@@ -132,6 +153,45 @@ void loadDataFromFile() {
 
     fclose(fp);
     printf("Data loaded successfully!\n");
+}
+
+// load data from file
+void loadAdminData() {
+    FILE *fp = fopen("admin_data.txt", "r");
+    if (!fp) {
+        printf("No admin data found. Using default admin.\n");
+        return;
+    }
+
+    fscanf(fp, "%d", &adminCount);
+    
+    if (adminCount > MAX_ADMINS) {
+        printf("Warning: Too many admins in file. Loading first %d only.\n", MAX_ADMINS);
+        adminCount = MAX_ADMINS;
+    }
+
+    char dummy;
+    fscanf(fp, "%c", &dummy);
+    
+    char line[200];
+    for (int i = 0; i < adminCount && fgets(line, sizeof(line), fp); i++) {
+        line[strcspn(line, "\n")] = '\0';
+        
+        char *token = strtok(line, ",");
+        if (token != NULL) {
+            strncpy(admins[i].username, token, MAX_USERNAME - 1);
+            admins[i].username[MAX_USERNAME - 1] = '\0';
+            
+            token = strtok(NULL, ",");
+            if (token != NULL) {
+                strncpy(admins[i].password, token, MAX_PASSWORD - 1);
+                admins[i].password[MAX_PASSWORD - 1] = '\0';
+            }
+        }
+    }
+
+    fclose(fp);
+    printf("Admin data loaded successfully! (%d admins loaded)\n", adminCount);
 }
 
 // ===== GET AIRLINE RULES =====
@@ -183,6 +243,9 @@ void createNewAdmin() {
     printf("Enter new admin password: ");
     scanf("%s", admins[adminCount].password);
     adminCount++;
+
+    saveAdminData();
+
     printf("New admin created successfully!\n");
 }
 
@@ -199,7 +262,8 @@ void adminMenu() {
         printf("6. View Airline Rules & Regulations\n");
         printf("7. Save Data Now\n");
         printf("8. Create a New Admin\n");
-        printf("9. Exit Admin Menu\n");
+        printf("9. Show All Admin\n");
+        printf("0. Exit Admin Menu\n");
         printf("Choose an option: ");
         scanf("%d", &choice);
         switch (choice) {
@@ -211,10 +275,11 @@ void adminMenu() {
             case 6: viewAirlineRules(); break;
             case 7: saveDataToFile(); break;
             case 8: createNewAdmin(); break;
-            case 9: printf("Exiting Admin Menu...\n"); break;
+            case 9: displayAdmins(); break;
+            case 0: printf("Exiting Admin Menu...\n"); break;
             default: printf("Invalid choice!\n");
         }
-    } while (choice != 9);
+    } while (choice != 0);
 }
 
 // ===== User Menu =====
@@ -224,33 +289,30 @@ void userMenu() {
         printf("\n===== USER MENU =====\n");
         printf("1. Display Seat Map\n");
         printf("2. Book a Seat\n");
-        printf("3. Cancel Booking\n");
-        printf("4. Search Your Booking Detail\n");
+        printf("3. Cancel My Booking\n");
+        printf("4. Search My Booking Detail\n");
         printf("5. View Airline Rules & Regulations\n");
-        printf("6. Save Data Now\n");
-        printf("7. Exit User Menu\n");
+        // printf("6. Save Data Now\n");
+        printf("6. Exit User Menu\n");
         printf("Choose an option: ");
         scanf("%d", &choice);
         switch (choice) {
             case 1: displaySeats(); break;
             case 2: bookSeat(); break;
-            case 3: cancelBooking(); break;
-            case 4: searchForPassenger(); break;
+            case 3: cancelUserBooking(); break;
+            case 4: searchForMyPassengerDetails(); break;
             case 5: viewAirlineRules(); break;
-            case 6: saveDataToFile(); break;
-            case 7: printf("Exiting User Menu...\n"); break;
+            // case 6: saveDataToFile(); break;
+            case 6: printf("Exiting User Menu...\n"); break;
             default: printf("Invalid choice!\n");
         }
-    } while (choice != 7);
+    } while (choice != 6);
 }
 
 // ===== Main Menu=====
 int main() {
-    strcpy(admins[0].username, "admin");
-    strcpy(admins[0].password, "password");
-    adminCount = 1;
-
     loadDataFromFile();
+    loadAdminData();
 
     int roleChoice;
     while (1) {  
@@ -261,19 +323,21 @@ int main() {
         printf("Choose role: ");
         scanf("%d", &roleChoice);
 
-        if (roleChoice == 1) {
-            if (loginAdmin()) {
-                adminMenu();
-            } else {
-                continue;
-            }
-        } else if (roleChoice == 2) {
-            userMenu();
-        } else if (roleChoice == 3) {
-            printf("Exiting system...\n");
-            break;
-        } else {
-            printf("Invalid choice. Try again.\n");
+        switch(roleChoice){
+            case 1: 
+                if (loginAdmin()) {
+                    adminMenu();
+                } else {
+                    continue;
+                }
+                break;
+            case 2: userMenu(); break;
+            case 3: printf("Exiting system...\n"); 
+                return 0;
+            default:
+                 printf("Invalid choice. Try again.\n");
+                 break;
+
         }
     }
 
@@ -341,7 +405,7 @@ void addPassenger(char id[], char name[], char email[], char phone[], int seatNu
     }
     printf("Passenger %s added successfully for seat %d.\n", name, seatNumber);
 
-    // saveDataToFile();
+    saveDataToFile();
 
 }
 
@@ -381,6 +445,23 @@ void displayAllPassengers() {
         temp = temp->next;
     }
     printf("----------------------\n");
+}
+
+// ===== Display Admins =====
+void displayAdmins() {
+    if (adminCount == 0) {
+        printf("No admins registered yet.\n");
+        return;
+    }
+
+    printf("\n--- Admin List ---\n");
+    for (int i = 0; i < adminCount; i++) {
+        printf("%d. Username: %s | Password: %s\n",
+               i + 1,
+               admins[i].username,
+               admins[i].password);
+    }
+    printf("------------------\n");
 }
 
 // search choice
@@ -431,6 +512,28 @@ void searchForPassenger() {
     } else {
         printf("Invalid choice.\n");
     }
+}
+
+void searchForMyPassengerDetails() {
+    if (!head) {
+        printf("No passengers booked yet.\n");
+        return;
+    }
+
+    char id[MAX_ID];
+    printf("Enter your passenger ID to cancel booking: ");
+    scanf("%s", id);
+
+    // find passenger by ID
+    Passenger *p = findPassengerById(id);
+    if (!p) {
+        printf("No booking found for passenger ID: %s\n", id);
+        return;
+    }
+    
+    printf("We found your booking:\n");
+    printf("Name: %s | Email: %s | Phone: %s | Seat: %d\n",
+        p->name, p->email, p->phone, p->seatNumber);
 }
 
 // Function to search passenger by ID
@@ -538,6 +641,46 @@ void cancelBooking() {
     return;
 }
 
+void cancelUserBooking() {
+    if (!head) {
+        printf("No passengers booked yet.\n");
+        return;
+    }
+
+    char id[MAX_ID];
+    printf("Enter your passenger ID to cancel booking: ");
+    scanf("%s", id);
+
+    // find passenger by ID
+    Passenger *p = findPassengerById(id);
+    if (!p) {
+        printf("No booking found for passenger ID: %s\n", id);
+        return;
+    }
+
+    int seatNumber = p->seatNumber;
+    int row = (seatNumber - 1) / COLS;
+    int col = (seatNumber - 1) % COLS;
+
+    printf("We found your booking:\n");
+    printf("Name: %s | Email: %s | Phone: %s | Seat: %d\n",
+           p->name, p->email, p->phone, p->seatNumber);
+
+    char confirmDelete = confirmDeletion();
+
+    if (confirmDelete == 'y' || confirmDelete == 'Y') {
+        seatMap[row][col] = 0; // free the seat
+        if (deletePassenger(seatNumber)) {
+            printf("Booking for seat %d cancelled successfully.\n", seatNumber);
+        } else {
+            printf("Error: Passenger not found during deletion.\n");
+        }
+    } else {
+        printf("Cancellation aborted.\n");
+    }
+}
+
+
 // delete passenger
 int deletePassenger(int seatNumber) {
     Passenger *temp = head, *prev = NULL;
@@ -547,6 +690,7 @@ int deletePassenger(int seatNumber) {
             if (prev) prev->next = temp->next;
             else head = temp->next;
             free(temp);
+            saveDataToFile();
             return 1;
         }
         prev = temp;
