@@ -248,7 +248,6 @@ int main() {
     return 0;
 }
 
-
 // ===== Passenger Functions =====
 void addPassenger(char id[], char name[], char email[], char phone[], int seatNumber) {
     Passenger *newPassenger = (Passenger *)malloc(sizeof(Passenger));
