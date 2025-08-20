@@ -121,23 +121,18 @@ void viewAirlineRules() {
 // ===== Admin System =====
 int loginAdmin() {
     char username[MAX_USERNAME], password[MAX_PASSWORD];
-
     printf("Enter admin username: ");
     scanf("%s", username);
     printf("Enter admin password: ");
     scanf("%s", password);
-
     for (int i = 0; i < adminCount; i++) {
-        if (strcmp(admins[i].username, username) == 0 &&
-            strcmp(admins[i].password, password) == 0) {
-            printf("Login successful!\n");
-            return 1; 
+        if (strcmp(admins[i].username, username) == 0 && strcmp(admins[i].password, password) == 0) {
+            return 1;
         }
     }
     printf("Invalid admin credentials.\n");
-    return 0; 
+    return 0;
 }
-
 
 void createNewAdmin() {
     if (adminCount >= MAX_ADMINS) {
@@ -212,6 +207,7 @@ void userMenu() {
 
 // ===== Main Menu=====
 int main() {
+    // Default admin
     strcpy(admins[0].username, "admin");
     strcpy(admins[0].password, "password");
     adminCount = 1;
@@ -219,35 +215,23 @@ int main() {
     loadDataFromFile();
 
     int roleChoice;
-    while (1) {  
-        printf("\n===== AIRLINE RESERVATION SYSTEM =====\n");
-        printf("1. Admin Login\n");
-        printf("2. User Access\n");
-        printf("3. Exit\n");
-        printf("Choose role: ");
-        scanf("%d", &roleChoice);
+    printf("\n===== AIRLINE RESERVATION SYSTEM =====\n");
+    printf("1. Admin Login\n");
+    printf("2. User Access\n");
+    printf("Choose role: ");
+    scanf("%d", &roleChoice);
 
-        if (roleChoice == 1) {
-            if (loginAdmin()) {
-                adminMenu();
-            } else {
-                
-                continue;
-            }
-        } else if (roleChoice == 2) {
-            userMenu();
-        } else if (roleChoice == 3) {
-            printf("Exiting system...\n");
-            break;
-        } else {
-            printf("Invalid choice. Try again.\n");
-        }
+    if (roleChoice == 1) {
+        if (loginAdmin()) adminMenu();
+    } else if (roleChoice == 2) {
+        userMenu();
+    } else {
+        printf("Invalid choice. Exiting...\n");
     }
 
     saveDataToFile();
     return 0;
 }
-
 
 // ===== Passenger Functions =====
 void addPassenger(char id[], char name[], char email[], char phone[], int seatNumber) {
