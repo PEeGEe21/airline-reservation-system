@@ -67,7 +67,6 @@ void displayAdmins();
 
 // ===== File Handling =====
 void saveDataToFile() {
-    // Step 1: Load the current file into a temporary seat map
     FILE *fp = fopen("booking_data.txt", "r");
     if (fp) {
         int fileRows, fileCols;
@@ -83,11 +82,9 @@ void saveDataToFile() {
 
         fclose(fp);
 
-        // Step 2: Compare tempSeatMap with in-memory seatMap
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                // If the file says it's booked (1) but we think it's free (0),
-                // it means a conflict → abort save
+               
                 if (tempSeatMap[i][j] == 1 && seatMap[i][j] == 0) {
                     printf("Conflict detected: seat [%d,%d] was booked by someone else. Aborting save!\n", i, j);
                     return;
@@ -96,7 +93,6 @@ void saveDataToFile() {
         }
     }
 
-    // Step 3: Proceed with saving (overwrite the file safely)
     fp = fopen("booking_data.txt", "w");
     if (!fp) {
         printf("Error saving data!\n");
@@ -111,7 +107,6 @@ void saveDataToFile() {
         fprintf(fp, "\n");
     }
 
-    // Save passengers linked list
     Passenger *temp = head;
     while (temp != NULL) {
         fprintf(fp, "%s,%s,%s,%s,%d\n",
@@ -125,7 +120,6 @@ void saveDataToFile() {
 
     fclose(fp);
 
-    // Step 4: Print success timestamp
     time_t now;
     time(&now);
     struct tm *local = localtime(&now);
