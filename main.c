@@ -31,7 +31,7 @@ typedef struct Admin {
 } Admin;
 
 Passenger *head = NULL;
-int seatMap[ROWS][COLS]; // 0 = available, 1 = booked
+int seatMap[ROWS][COLS]; 
 Admin admins[MAX_ADMINS];
 int adminCount = 0;
 
